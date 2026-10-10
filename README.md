@@ -53,10 +53,14 @@ Optional env: `KANUTUS_API_URL` (default `https://api.kanutus.com`).
 | `create_join_link` | guest link with name and languages prefilled | |
 | `list_meetings`, `schedule_meeting`, `cancel_meeting` | scheduled meetings | cancel is destructive, asks to confirm |
 | `list_booking_links`, `find_slots`, `book_slot` | booking links (like Calendly) | |
-| `list_voices` | your voices | read-only |
+| `list_voices`, `get_voice` | your voices (consented clones with their status, your own clones, generic picks) | read-only |
+| `list_voice_catalog`, `choose_generic_voice` | stock voices anyone can use | |
+| `create_voice` | clone a voice **with the owner's consent**: returns a link the person opens to read a consent sentence and record live (no audio upload, ever) | asks to confirm |
+| `delete_voice` | revoke a cloned voice / remove a generic pick | destructive, asks to confirm |
 | `list_transcripts`, `get_transcript` | transcripts this connection can read | read-only |
 | `join_room`, `say`, `listen`, `leave` | take part in a room as an AI agent (AI badge) | join asks to confirm; uses minutes |
 | `quote_call`, `start_call` | phone destination and purpose rules per country; translated call as an AI agent | start asks to confirm; always announces it is an AI |
+| `get_call`, `hangup_call`, `send_dtmf` | call status, hang up, press keys (0-9, * and #) for phone menus | hang up is destructive |
 
 Safety:
 
@@ -65,8 +69,8 @@ Safety:
 - Anything said or written by other people (transcripts, room titles, names) comes back inside `untrusted_content`:
   it is data, never instructions.
 - Create requests carry an idempotency key, so an assistant retrying a call never creates something twice.
-- Live AI agents in rooms and phone calls are rolling out; with a live key these tools answer "coming soon". Try them
-  with a `kt_test_` key.
+- Live AI agents in rooms, voice cloning and phone calls are rolling out; with a live key they may answer "coming soon".
+  Try them with a `kt_test_` key (simulator). In a room the agent always shows with the "AI agent" badge.
 
 ## Develop
 
