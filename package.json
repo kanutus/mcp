@@ -1,6 +1,6 @@
 {
   "name": "@kanutus/mcp",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Kanutus MCP server: rooms with live translation, meetings, booking, voices and usage for Claude, ChatGPT and your own agents.",
   "license": "MIT",
   "type": "module",
