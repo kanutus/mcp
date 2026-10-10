@@ -4,5 +4,5 @@
   "buildCommand": "npm run build",
   "outputDirectory": "public",
   "rewrites": [{ "source": "/(.*)", "destination": "/api" }],
-  "functions": { "api/index.ts": { "maxDuration": 60 } }
+  "functions": { "api/index.ts": { "maxDuration": 800 } }
 }
