@@ -4,7 +4,7 @@
   "description": "Kanutus MCP server: rooms with live translation, meetings, booking, voices and usage for Claude, ChatGPT and your own agents.",
   "license": "MIT",
   "type": "module",
-  "homepage": "https://kanutus.com/developers",
+  "homepage": "https://docs.kanutus.com/mcp",
   "repository": { "type": "git", "url": "https://github.com/kanutus/mcp" },
   "keywords": ["mcp", "model-context-protocol", "kanutus", "translation", "meetings"],
   "bin": { "kanutus-mcp": "dist/stdio.js" },

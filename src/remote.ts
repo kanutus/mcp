@@ -50,7 +50,7 @@ export function createRemoteHandler(cfg: RemoteConfig) {
     bearer_methods_supported: ["header"],
     scopes_supported: SCOPES,
     resource_name: "Kanutus",
-    resource_documentation: "https://kanutus.com/developers",
+    resource_documentation: "https://docs.kanutus.com/mcp",
   };
   const metaUrl = `${origin}/.well-known/oauth-protected-resource${mcpPath}`;
 
