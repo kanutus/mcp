@@ -59,7 +59,8 @@ Optional env: `KANUTUS_API_URL` (default `https://api.kanutus.com`).
 | `delete_voice` | revoke a cloned voice / remove a generic pick | destructive, asks to confirm |
 | `list_transcripts`, `get_transcript` | transcripts this connection can read | read-only |
 | `join_room`, `say`, `listen`, `leave` | take part in a room as an AI agent (AI badge) | join asks to confirm; uses minutes |
-| `quote_call`, `start_call` | phone destination and purpose rules per country; translated call as an AI agent | start asks to confirm; always announces it is an AI |
+| `list_numbers` | numbers you can call from ("Call from"), the default one marked | read-only |
+| `quote_call`, `start_call` | phone destination and purpose rules per country; translated call as an AI agent (`from` = number id from `list_numbers`) | start asks to confirm; always announces it is an AI |
 | `get_call`, `hangup_call`, `send_dtmf` | call status, hang up, press keys (0-9, * and #) for phone menus | hang up is destructive |
 
 Safety:

@@ -45,7 +45,7 @@ describe("Kanutus MCP tools", () => {
     expect(names).toEqual(expect.arrayContaining([
       "kanutus_whoami", "get_balance", "get_usage", "list_rooms", "create_room", "get_room", "end_room", "create_join_link",
       "list_meetings", "schedule_meeting", "cancel_meeting", "list_booking_links", "find_slots", "book_slot", "list_voices",
-      "list_transcripts", "get_transcript", "join_room", "say", "listen", "leave", "quote_call", "start_call",
+      "list_transcripts", "get_transcript", "join_room", "say", "listen", "leave", "quote_call", "start_call", "list_numbers",
       "create_voice", "get_voice", "delete_voice", "list_voice_catalog", "choose_generic_voice", "get_call", "hangup_call", "send_dtmf",
     ]));
     const by = Object.fromEntries(tools.map((t) => [t.name, t.annotations]));
