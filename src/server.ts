@@ -217,7 +217,7 @@ export function createKanutusServer(opts: ServerOptions): McpServer {
   );
   server.registerTool(
     "choose_generic_voice",
-    { title: "Choose a generic voice", description: "Add a stock voice from list_voice_catalog to your voices; use its id as voice_id in join_room.", inputSchema: { voice_id: z.string().regex(/^generic_[0-9A-Za-z]{6,40}$/) }, annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: true, openWorldHint: false } },
+    { title: "Choose a generic voice", description: "Add a stock voice from list_voice_catalog to your voices; use its id as voice_id in join_room.", inputSchema: { voice_id: z.string().regex(/^generic_[0-9A-Za-z_-]{6,40}$/) }, annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: true, openWorldHint: false } },
     (a) => run(async () => ok(await client.request("POST", "/v1/voices/generic", { voice_id: a.voice_id }))),
   );
   server.registerTool(
@@ -249,7 +249,7 @@ export function createKanutusServer(opts: ServerOptions): McpServer {
   );
   server.registerTool(
     "delete_voice",
-    { title: "Delete voice", description: "Delete a voice: a consented clone is revoked and removed from the voice provider; a generic pick is removed. Asks for confirmation.", inputSchema: { voice_id: z.string(), confirm: z.boolean().optional() }, annotations: { readOnlyHint: false, destructiveHint: true, idempotentHint: true, openWorldHint: false } },
+    { title: "Delete voice", description: "Delete a voice: a consented clone is revoked and deleted from the Kanutus voice engine; a generic pick is removed. Asks for confirmation.", inputSchema: { voice_id: z.string(), confirm: z.boolean().optional() }, annotations: { readOnlyHint: false, destructiveHint: true, idempotentHint: true, openWorldHint: false } },
     (a) =>
       run(async () => {
         if (!(await confirmed(`Delete voice ${a.voice_id}? A cloned voice cannot be recovered without a new consent.`, a.confirm))) return needConfirm("deleting the voice");
