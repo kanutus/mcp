@@ -157,3 +157,11 @@ describe("remote Streamable HTTP with OAuth", () => {
     await client.close();
   });
 });
+
+describe("supported languages", () => {
+  it("mirror the core's offered languages (17/10/2026)", async () => {
+    const { SUPPORTED_LANGS } = await import("../src/server.js");
+    const core = await import("../../../packages/kanutus-core/src/languages.js");
+    expect([...SUPPORTED_LANGS]).toEqual([...core.OFFERED_LANGS]);
+  });
+});

@@ -41,7 +41,18 @@ export interface ServerOptions {
   credentialScope: string;
 }
 
-const LANG = z.string().regex(/^[a-z]{2,3}(-[A-Za-z]{2,4})?$/).describe("Language code, e.g. pt, en, ja, es, fr");
+/**
+ * Translation/voice languages offered (mirror of OFFERED_LANGS in @oncue/kanutus-core/languages, 17/10/2026; this
+ * package ships without the core, a test keeps both in sync). Old data in other languages is still readable (ANY_LANG).
+ */
+export const SUPPORTED_LANGS = ["pt", "en", "es", "it", "fr", "de", "nl", "tr", "zh", "ja", "ko", "ru", "pl", "uk", "sv", "vi"] as const;
+const LANG_TAG = /^[a-z]{2,3}(-[A-Za-z]{2,4})?$/;
+const LANG = z
+  .string()
+  .regex(LANG_TAG)
+  .refine((v) => (SUPPORTED_LANGS as readonly string[]).includes(v.split("-")[0]!), { message: `Unsupported language. Supported: ${SUPPORTED_LANGS.join(", ")}` })
+  .describe(`Language code. Supported: ${SUPPORTED_LANGS.join(", ")}`);
+const ANY_LANG = z.string().regex(LANG_TAG).describe("Language code, e.g. pt, en, ja");
 const ROOM_ID = z.string().regex(/^[a-z]{3}-[a-z]{4}-[a-z]{3}$/).describe("Room id like kqz-mbdt-wpa");
 
 export function createKanutusServer(opts: ServerOptions): McpServer {
@@ -259,7 +270,7 @@ export function createKanutusServer(opts: ServerOptions): McpServer {
   server.registerTool("list_transcripts", { title: "List transcripts", description: "Transcripts this connection can read (only conversations it can see). " + UNTRUSTED, inputSchema: { room_id: ROOM_ID.optional() }, annotations: RO }, (a) =>
     run(async () => ok(await client.request("GET", "/v1/transcripts", undefined, { query: a }))),
   );
-  server.registerTool("get_transcript", { title: "Read transcript", description: "Read a transcript in a language. " + UNTRUSTED, inputSchema: { transcript_id: z.string(), lang: LANG.optional() }, annotations: RO }, (a) =>
+  server.registerTool("get_transcript", { title: "Read transcript", description: "Read a transcript in a language. " + UNTRUSTED, inputSchema: { transcript_id: z.string(), lang: ANY_LANG.optional() }, annotations: RO }, (a) =>
     run(async () => ok(await client.request("GET", `/v1/transcripts/${a.transcript_id}`, undefined, { query: { lang: a.lang } }))),
   );
 
