@@ -42,10 +42,13 @@ export interface ServerOptions {
 }
 
 /**
- * Translation/voice languages offered (mirror of OFFERED_LANGS in @oncue/kanutus-core/languages, 17/10/2026; this
- * package ships without the core, a test keeps both in sync). Old data in other languages is still readable (ANY_LANG).
+ * Translation/voice languages offered (mirror of OFFERED_LANGS in @oncue/kanutus-core/languages, 26 since 18/10/2026;
+ * this package ships without the core, a test keeps both in sync). Old data in other languages is still readable (ANY_LANG).
  */
-export const SUPPORTED_LANGS = ["pt", "en", "es", "it", "fr", "de", "nl", "tr", "zh", "ja", "ko", "ru", "pl", "uk", "sv", "vi"] as const;
+export const SUPPORTED_LANGS = [
+  "pt", "en", "es", "it", "fr", "de", "nl", "tr", "zh", "ja", "ko", "ru", "pl", "uk", "sv", "vi",
+  "da", "nb", "hi", "ar", "el", "id", "cs", "fi", "ro", "hu",
+] as const;
 const LANG_TAG = /^[a-z]{2,3}(-[A-Za-z]{2,4})?$/;
 const LANG = z
   .string()
