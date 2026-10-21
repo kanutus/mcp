@@ -42,18 +42,19 @@ export interface ServerOptions {
 }
 
 /**
- * Translation/voice languages offered (mirror of OFFERED_LANGS in @oncue/kanutus-core/languages, 26 since 18/10/2026;
+ * Translation/voice languages offered (mirror of OFFERED_LANGS in @oncue/kanutus-core/languages, 27 since 20/10/2026 with
+ * European Portuguese "pt-PT";
  * this package ships without the core, a test keeps both in sync). Old data in other languages is still readable (ANY_LANG).
  */
 export const SUPPORTED_LANGS = [
-  "pt", "en", "es", "it", "fr", "de", "nl", "tr", "zh", "ja", "ko", "ru", "pl", "uk", "sv", "vi",
+  "pt", "pt-PT", "en", "es", "it", "fr", "de", "nl", "tr", "zh", "ja", "ko", "ru", "pl", "uk", "sv", "vi",
   "da", "nb", "hi", "ar", "el", "id", "cs", "fi", "ro", "hu",
 ] as const;
 const LANG_TAG = /^[a-z]{2,3}(-[A-Za-z]{2,4})?$/;
 const LANG = z
   .string()
   .regex(LANG_TAG)
-  .refine((v) => (SUPPORTED_LANGS as readonly string[]).includes(v.split("-")[0]!), { message: `Unsupported language. Supported: ${SUPPORTED_LANGS.join(", ")}` })
+  .refine((v) => (SUPPORTED_LANGS as readonly string[]).some((l) => l.toLowerCase() === v.toLowerCase()) || (SUPPORTED_LANGS as readonly string[]).includes(v.split("-")[0]!), { message: `Unsupported language. Supported: ${SUPPORTED_LANGS.join(", ")}` })
   .describe(`Language code. Supported: ${SUPPORTED_LANGS.join(", ")}`);
 const ANY_LANG = z.string().regex(LANG_TAG).describe("Language code, e.g. pt, en, ja");
 const ROOM_ID = z.string().regex(/^[a-z]{3}-[a-z]{4}-[a-z]{3}$/).describe("Room id like kqz-mbdt-wpa");
