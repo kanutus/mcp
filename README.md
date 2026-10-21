@@ -58,7 +58,9 @@ Optional env: `KANUTUS_API_URL` (default `https://api.kanutus.com`).
 | `create_voice` | clone a voice **with the owner's consent**: returns a link the person opens to read a consent sentence and record live (no audio upload, ever) | asks to confirm |
 | `delete_voice` | revoke a cloned voice / remove a generic pick | destructive, asks to confirm |
 | `list_transcripts`, `get_transcript` | transcripts this connection can read | read-only |
-| `join_room`, `say`, `listen`, `leave` | take part in a room as an AI agent (AI badge) | join asks to confirm; uses minutes |
+| `list_avatars` | published Kanutus avatars the agent can show on camera (id, name, gender, preview) | read-only |
+| `join_room`, `say`, `listen`, `leave` | take part in a room as an AI agent (AI badge); `avatar_id` from `list_avatars` puts the agent on camera with that avatar (lips moved by its voice); `see_participants` + `snapshot_every_s` (5, 10, 20, 40, 60, 90, 120, 500 or 900 s, default 20) makes `listen` bring one snapshot per participant as images (camera off = `camera_on: false`, no image); everyone in the room sees a permanent notice | join asks to confirm; uses minutes; snapshots free in this version |
+| `look` | a fresh snapshot of the participants' cameras and shared screens right now, as images (sessions with `see_participants`) | read-only |
 | `list_numbers` | numbers you can call from ("Call from"), the default one marked | read-only |
 | `quote_call`, `start_call` | phone destination and purpose rules per country; translated call as an AI agent (`from` = number id from `list_numbers`) | start asks to confirm; always announces it is an AI |
 | `get_call`, `hangup_call`, `send_dtmf` | call status, hang up, press keys (0-9, * and #) for phone menus | hang up is destructive |
@@ -72,6 +74,15 @@ Safety:
 - Create requests carry an idempotency key, so an assistant retrying a call never creates something twice.
 - Live AI agents in rooms, voice cloning and phone calls are rolling out; with a live key they may answer "coming soon".
   Try them with a `kt_test_` key (simulator). In a room the agent always shows with the "AI agent" badge.
+
+## Changelog
+
+- **0.3.1** (2026-10-21): `list_avatars` (published avatar catalog) and `avatar_id` in `join_room`: the agent appears
+  on camera with a Kanutus avatar animated by its voice; `listen` reports `face: starting | live | unavailable`.
+  Agent vision: `see_participants` + `snapshot_every_s` in `join_room` (5, 10, 20, 40, 60, 90, 120, 500 or 900 s),
+  snapshots of the participants' cameras and screens as image blocks in `listen`, and the new `look` tool; the room
+  shows everyone a permanent notice. Nothing is stored; no charge for snapshots in this version.
+- **0.3.0**: 27 languages (European Portuguese), numbers to call from (`list_numbers`, `from` in calls).
 
 ## Develop
 
