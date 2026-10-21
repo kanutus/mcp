@@ -77,6 +77,12 @@ Safety:
 
 ## Changelog
 
+- **0.3.2** (2026-10-21): the agent's introduction is automatic and mandatory. When it joins (and again to each person
+  who joins later) the room hears and reads, translated, "Hello, I am <name>, an AI agent." and, with
+  `see_participants`, "Depending on the situation, I may ask you to share your camera or your screen." Free, no opt-out;
+  `listen` returns `agent.introduced`. `join_room` now explains that evaluating people from what the agent sees (an
+  interview, for example) needs their explicit consent beforehand and a human review (rules vary by country: EU,
+  Illinois, New York, LGPD).
 - **0.3.1** (2026-10-21): `list_avatars` (published avatar catalog) and `avatar_id` in `join_room`: the agent appears
   on camera with a Kanutus avatar animated by its voice; `listen` reports `face: starting | live | unavailable`.
   Agent vision: `see_participants` + `snapshot_every_s` in `join_room` (5, 10, 20, 40, 60, 90, 120, 500 or 900 s),

@@ -72,6 +72,21 @@ describe("Kanutus MCP tools", () => {
     expect(calls.find((c) => c.url.includes("/look"))!.url).toContain("participant_id=u_kenji");
   });
 
+  it("mandatory introduction: join_room tells the model it is automatic, free and that evaluating people needs consent", async () => {
+    const calls: Call[] = [];
+    const client = await connect(calls);
+    const tools = (await client.listTools()).tools;
+    const join = tools.find((t) => t.name === "join_room")!;
+    expect(join.description).toMatch(/INTRODUCTION \(automatic, mandatory, free\)/);
+    expect(join.description).toMatch(/Hello, I am <name>, an AI agent\./);
+    expect(join.description).toMatch(/share your camera or your screen/);
+    expect(join.description).toMatch(/explicit consent before the interview and offer a human review/);
+    expect(join.description).toMatch(/EU, Illinois, New York, LGPD/);
+    expect(join.description).not.toMatch(/announce/);
+    const joined = await client.callTool({ name: "join_room", arguments: { room_id: "abc-defg-hij", speak_lang: "pt", hear_lang: "pt", confirm: true } });
+    expect((joined.content as { type: string; text: string }[])[0]!.text).toMatch(/automatic introduction \("I am an AI agent"\); do not repeat it/);
+  });
+
   it("avatar on camera: list_avatars reads the published catalog and join_room passes avatar_id to the API", async () => {
     const calls: Call[] = [];
     const client = await connect(calls);
