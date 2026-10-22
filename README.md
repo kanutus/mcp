@@ -78,6 +78,9 @@ Safety:
 
 ## Changelog
 
+- **0.3.4** (2026-10-22): `say` returns as soon as the speech is queued; call `listen` right away and keep calling it
+  while you speak (people keep talking and their words only reach you on `listen`). Joining never waits for the engines
+  to warm up: the agent enters at once (badge, no voice yet), uses the chat and watches `engines`/`stage`/`eta_s`.
 - **0.3.3** (2026-10-22): the agent reads and writes the room chat. `join_room` returns `chat_history` (last 50
   messages), `listen` returns a `chat.message` event per new message (text + translation to the hear language, null while
   the translator warms up) and the new `send_chat` posts in the chat as the agent ("AI agent" badge, translated for each
