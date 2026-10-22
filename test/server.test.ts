@@ -32,9 +32,11 @@ function fakeApi(calls: Call[]): typeof fetch {
     if (u.pathname === "/v1/avatars") return Response.json({ data: [{ id: "7c9e6679-7425-40de-944b-e07fc1f90ae7", name: "Avatar 07", gender: "female", age_band: "25-35", style: "casual", poster_url: "https://app.test/api/face/avatars/7c9e6679/media?variation=a1&file=photo", variations: [{ code: "a1", kind: "angle", photo_url: null, video_types: ["talk-neutral"], preview_urls: {} }], suggested_voices: { pt: "v-pt" } }] });
     if (/^\/v1\/rooms\/[a-z-]+\/agent-sessions$/.test(u.pathname) && init?.method === "POST") {
       const b = JSON.parse(String(init.body));
-      return Response.json({ id: "ses_abcdefghijklmnopqrstuv", room_id: "abc-defg-hij", name: b.name ?? "Assistente de IA", speak_lang: b.speak_lang, hear_lang: b.hear_lang, ...(b.avatar_id ? { avatar_id: b.avatar_id } : {}), status: "active", billed_seconds: 0, started_at: "2026-10-21T00:00:00Z", ended_at: null, livemode: false }, { status: 201 });
+      return Response.json({ id: "ses_abcdefghijklmnopqrstuv", room_id: "abc-defg-hij", name: b.name ?? "Assistente de IA", speak_lang: b.speak_lang, hear_lang: b.hear_lang, ...(b.avatar_id ? { avatar_id: b.avatar_id } : {}), status: "active", billed_seconds: 0, started_at: "2026-10-21T00:00:00Z", ended_at: null, livemode: false,
+        chat_history: [{ id: "m1abcdef", participant: { id: "u_kenji", name: "Kenji" }, agent: false, lang: "ja", at: "2026-10-22T12:00:00.000Z", untrusted_content: { text: "https://example.com/cv.pdf", translated: null } }] }, { status: 201 });
     }
     if (u.pathname === "/v1/voices" && init?.method === "POST") return Response.json({ id: "vce_abcdefghijklmnopqrstuvwx", status: "awaiting_consent", consent_url: "https://app.kanutus.com/voz/consentimento/T" }, { status: 202 });
+    if (/^\/v1\/sessions\/[^/]+\/chat$/.test(u.pathname) && init?.method === "POST") return Response.json({ id: "zZyYxXwWvV", at: "2026-10-22T12:02:00.000Z", chars: JSON.parse(String(init.body)).text.length, livemode: false }, { status: 202 });
     if (u.pathname.endsWith("/hangup")) return Response.json({ id: "call_abcdefghijkl", status: "completed" });
     if (u.pathname.endsWith("/dtmf")) return Response.json({ id: "call_abcdefghijkl", sent: "2#", status: "answered" });
     return Response.json({ code: "not_found", message: "nope" }, { status: 404 });
@@ -50,6 +52,29 @@ async function connect(calls: Call[], capabilities: Record<string, unknown> = {}
 }
 
 describe("Kanutus MCP tools", () => {
+  it("room chat: join_room reports the chat_history, send_chat posts to /chat (free), listen describes chat.message", async () => {
+    const calls: Call[] = [];
+    const client = await connect(calls);
+    const joined = await client.callTool({ name: "join_room", arguments: { room_id: "abc-defg-hij", speak_lang: "pt", hear_lang: "pt", confirm: true } });
+    expect(joined.isError).toBeFalsy();
+    const text = (joined.content as { text: string }[])[0]!.text;
+    expect(text).toContain("chat_history has the last 1 chat message(s)");
+    expect(text).toContain("send_chat(session_id, text)");
+    expect((joined.structuredContent as any).chat_history[0].untrusted_content.text).toBe("https://example.com/cv.pdf");
+    const sent = await client.callTool({ name: "send_chat", arguments: { session_id: "ses_abcdefghijklmnopqrstuv", text: "Pode colar o link aqui." } });
+    expect(sent.isError).toBeFalsy();
+    const post = calls.find((c) => c.url.endsWith("/v1/sessions/ses_abcdefghijklmnopqrstuv/chat"))!;
+    expect(post.method).toBe("POST");
+    expect(JSON.parse(post.body)).toEqual({ text: "Pode colar o link aqui." });
+    expect((sent.content as { text: string }[])[0]!.text).toContain("Posted in the room chat.");
+    expect((sent.structuredContent as any).chars).toBe("Pode colar o link aqui.".length);
+    const { tools } = await client.listTools();
+    expect(tools.find((t) => t.name === "listen")!.description).toContain("chat.message");
+    expect(tools.find((t) => t.name === "send_chat")!.annotations?.readOnlyHint).toBe(false);
+    const tooLong = await client.callTool({ name: "send_chat", arguments: { session_id: "ses_abcdefghijklmnopqrstuv", text: "x".repeat(2001) } });
+    expect(tooLong.isError).toBe(true);
+  });
+
   it("agent vision: join_room validates snapshot_every_s, listen and look return the snapshots as image blocks (no base64 in the text)", async () => {
     const calls: Call[] = [];
     const client = await connect(calls);
@@ -111,7 +136,7 @@ describe("Kanutus MCP tools", () => {
       "list_meetings", "schedule_meeting", "cancel_meeting", "list_booking_links", "find_slots", "book_slot", "list_voices",
       "list_transcripts", "get_transcript", "join_room", "say", "listen", "leave", "quote_call", "start_call", "list_numbers",
       "create_voice", "get_voice", "delete_voice", "list_voice_catalog", "choose_generic_voice", "get_call", "hangup_call", "send_dtmf",
-      "list_avatars", "look",
+      "list_avatars", "look", "send_chat",
     ]));
     const by = Object.fromEntries(tools.map((t) => [t.name, t.annotations]));
     expect(by.list_rooms?.readOnlyHint).toBe(true);

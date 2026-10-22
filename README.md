@@ -61,6 +61,7 @@ Optional env: `KANUTUS_API_URL` (default `https://api.kanutus.com`).
 | `list_avatars` | published Kanutus avatars the agent can show on camera (id, name, gender, preview) | read-only |
 | `join_room`, `say`, `listen`, `leave` | take part in a room as an AI agent (AI badge); `avatar_id` from `list_avatars` puts the agent on camera with that avatar (lips moved by its voice); `see_participants` + `snapshot_every_s` (5, 10, 20, 40, 60, 90, 120, 500 or 900 s, default 20) makes `listen` bring one snapshot per participant as images (camera off = `camera_on: false`, no image); everyone in the room sees a permanent notice | join asks to confirm; uses minutes; snapshots free in this version |
 | `look` | a fresh snapshot of the participants' cameras and shared screens right now, as images (sessions with `see_participants`) | read-only |
+| `send_chat` | write in the room chat as the agent (AI badge, translated for each reader); `listen` brings what people write as `chat.message` and `join_room` the last 50 messages as `chat_history` | free (text); 2000 chars, 1/s |
 | `list_numbers` | numbers you can call from ("Call from"), the default one marked | read-only |
 | `quote_call`, `start_call` | phone destination and purpose rules per country; translated call as an AI agent (`from` = number id from `list_numbers`) | start asks to confirm; always announces it is an AI |
 | `get_call`, `hangup_call`, `send_dtmf` | call status, hang up, press keys (0-9, * and #) for phone menus | hang up is destructive |
@@ -77,6 +78,10 @@ Safety:
 
 ## Changelog
 
+- **0.3.3** (2026-10-22): the agent reads and writes the room chat. `join_room` returns `chat_history` (last 50
+  messages), `listen` returns a `chat.message` event per new message (text + translation to the hear language, null while
+  the translator warms up) and the new `send_chat` posts in the chat as the agent ("AI agent" badge, translated for each
+  reader; free; 2000 characters, one per second).
 - **0.3.2** (2026-10-21): the agent's introduction is automatic and mandatory. When it joins (and again to each person
   who joins later) the room hears and reads, translated, "Hello, I am <name>, an AI agent." and, with
   `see_participants`, "Depending on the situation, I may ask you to share your camera or your screen." Free, no opt-out;
