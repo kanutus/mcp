@@ -37,6 +37,8 @@ function fakeApi(calls: Call[]): typeof fetch {
     }
     if (u.pathname === "/v1/voices" && init?.method === "POST") return Response.json({ id: "vce_abcdefghijklmnopqrstuvwx", status: "awaiting_consent", consent_url: "https://app.kanutus.com/voz/consentimento/T" }, { status: 202 });
     if (/^\/v1\/sessions\/[^/]+\/chat$/.test(u.pathname) && init?.method === "POST") return Response.json({ id: "zZyYxXwWvV", at: "2026-10-22T12:02:00.000Z", chars: JSON.parse(String(init.body)).text.length, livemode: false }, { status: 202 });
+    if (/^\/v1\/sessions\/[^/]+\/say$/.test(u.pathname)) return Response.json({ utterance_id: "utt_x", queued_ms: 3, charged_seconds: 2, livemode: false, speaking: [{ participant_id: "u_kenji", display_name: "Kenji" }], events: [], cursor: 9 }, { status: 202 });
+    if (/^\/v1\/sessions\/[^/]+\/interrupt$/.test(u.pathname)) return Response.json({ stopped: true, dropped: 1, seq: 4, played_s: 1.5, spoken_text: "Bom dia,", unspoken_text: "a todos." });
     if (u.pathname.endsWith("/hangup")) return Response.json({ id: "call_abcdefghijkl", status: "completed" });
     if (u.pathname.endsWith("/dtmf")) return Response.json({ id: "call_abcdefghijkl", sent: "2#", status: "answered" });
     return Response.json({ code: "not_found", message: "nope" }, { status: 404 });
@@ -52,6 +54,23 @@ async function connect(calls: Call[], capabilities: Record<string, unknown> = {}
 }
 
 describe("Kanutus MCP tools", () => {
+  it("turn taking (0.3.5): say forwards cursor and tells to wait while someone speaks; stop_speaking calls /interrupt", async () => {
+    const calls: Call[] = [];
+    const client = await connect(calls);
+    const said = await client.callTool({ name: "say", arguments: { session_id: "ses_abcdefghijklmnopqrstuv", text: "Bom dia a todos.", cursor: 7 } });
+    expect(said.isError).toBeFalsy();
+    const post = calls.find((c) => c.url.endsWith("/say"))!;
+    expect(JSON.parse(post.body)).toEqual({ text: "Bom dia a todos.", cursor: 7 });
+    expect((said.structuredContent as any).speaking[0].participant_id).toBe("u_kenji");
+    const stop = await client.callTool({ name: "stop_speaking", arguments: { session_id: "ses_abcdefghijklmnopqrstuv" } });
+    expect(stop.isError).toBeFalsy();
+    expect(calls.some((c) => c.method === "POST" && c.url.endsWith("/v1/sessions/ses_abcdefghijklmnopqrstuv/interrupt"))).toBe(true);
+    expect((stop.structuredContent as any).unspoken_text).toBe("a todos.");
+    const { tools } = await client.listTools();
+    for (const n of ["say", "listen"]) expect(tools.find((t) => t.name === n)!.description).toContain("utterance.interrupted");
+    expect(tools.find((t) => t.name === "listen")!.description).toContain("`speaking`");
+  });
+
   it("room chat: join_room reports the chat_history, send_chat posts to /chat (free), listen describes chat.message", async () => {
     const calls: Call[] = [];
     const client = await connect(calls);

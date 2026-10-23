@@ -78,6 +78,11 @@ Safety:
 
 ## Changelog
 
+- **0.3.5** (2026-10-23): turn taking. `listen` and `say` return `speaking` (who is talking right now) and `listen`
+  wakes up when a person starts or stops talking: wait until nobody is talking before `say`. The room never plays the
+  agent over a person or over its own previous sentence, and a person who talks over the agent stops its voice
+  (`utterance.interrupted` with `spoken_text`/`unspoken_text`). `say` takes an optional `cursor` and then returns what
+  people said meanwhile. New `stop_speaking` tool.
 - **0.3.4** (2026-10-22): `say` returns as soon as the speech is queued; call `listen` right away and keep calling it
   while you speak (people keep talking and their words only reach you on `listen`). Joining never waits for the engines
   to warm up: the agent enters at once (badge, no voice yet), uses the chat and watches `engines`/`stage`/`eta_s`.
