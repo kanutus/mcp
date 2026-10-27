@@ -58,8 +58,8 @@ Optional env: `KANUTUS_API_URL` (default `https://api.kanutus.com`).
 | `create_voice` | clone a voice **with the owner's consent**: returns a link the person opens to read a consent sentence and record live (no audio upload, ever) | asks to confirm |
 | `delete_voice` | revoke a cloned voice / remove a generic pick | destructive, asks to confirm |
 | `list_transcripts`, `get_transcript` | transcripts this connection can read | read-only |
-| `list_avatars` | published Kanutus avatars the agent can show on camera (id, name, gender, preview) | read-only |
-| `join_room`, `say`, `listen`, `leave` | take part in a room as an AI agent (AI badge); `avatar_id` from `list_avatars` puts the agent on camera with that avatar (lips moved by its voice); `see_participants` + `snapshot_every_s` (5, 10, 20, 40, 60, 90, 120, 500 or 900 s, default 20) makes `listen` bring one snapshot per participant as images (camera off = `camera_on: false`, no image); everyone in the room sees a permanent notice | join asks to confirm; uses minutes; snapshots free in this version |
+| `list_avatars` | (coming soon) AI avatars the agent will be able to show on camera; empty list for now | read-only |
+| `join_room`, `say`, `listen`, `leave` | take part in a room as an AI agent (AI badge); `avatar_id` (coming soon: accepted and ignored, the agent joins voice only); `see_participants` + `snapshot_every_s` (5, 10, 20, 40, 60, 90, 120, 500 or 900 s, default 20) makes `listen` bring one snapshot per participant as images (camera off = `camera_on: false`, no image); everyone in the room sees a permanent notice | join asks to confirm; uses minutes; snapshots free in this version |
 | `look` | a fresh snapshot of the participants' cameras and shared screens right now, as images (sessions with `see_participants`) | read-only |
 | `send_chat` | write in the room chat as the agent (AI badge, translated for each reader); `listen` brings what people write as `chat.message` and `join_room` the last 50 messages as `chat_history` | free (text); 2000 chars, 1/s |
 | `list_numbers` | numbers you can call from ("Call from"), the default one marked | read-only |
@@ -78,6 +78,8 @@ Safety:
 
 ## Changelog
 
+- **0.3.6** (2026-10-26): AI avatars are coming soon. `list_avatars` returns an empty list with `status: "coming_soon"`
+  and `join_room` accepts `avatar_id` but the agent joins voice only (the answer says so). Nothing else changes.
 - **0.3.5** (2026-10-23): turn taking. `listen` and `say` return `speaking` (who is talking right now) and `listen`
   wakes up when a person starts or stops talking: wait until nobody is talking before `say`. The room never plays the
   agent over a person or over its own previous sentence, and a person who talks over the agent stops its voice
