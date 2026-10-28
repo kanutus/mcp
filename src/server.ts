@@ -93,6 +93,9 @@ const LANG = z
   .describe(`Language code. Supported: ${SUPPORTED_LANGS.join(", ")}`);
 const ANY_LANG = z.string().regex(LANG_TAG).describe("Language code, e.g. pt, en, ja");
 const ROOM_ID = z.string().regex(/^[a-z]{3}-[a-z]{4}-[a-z]{3}$/).describe("Room id like kqz-mbdt-wpa");
+const BILL_MODE = z
+  .enum(["host", "each"])
+  .describe("Who pays: \"host\" (default) = the owner's minutes cover everyone; \"each\" = every Kanutus account pays its own part. Guests without an account are always covered by the owner.");
 
 export function createKanutusServer(opts: ServerOptions): McpServer {
   const { client } = opts;
@@ -155,7 +158,7 @@ export function createKanutusServer(opts: ServerOptions): McpServer {
     {
       title: "Create room",
       description: "Create an instant room with live translation and get its link. Free: translation is charged while people speak.",
-      inputSchema: { title: z.string().max(120).optional(), visibility: z.enum(["private", "public"]).optional(), langs: z.array(LANG).max(12).optional(), idempotency_key: z.string().max(255).optional() },
+      inputSchema: { title: z.string().max(120).optional(), visibility: z.enum(["private", "public"]).optional(), langs: z.array(LANG).max(12).optional(), bill_mode: BILL_MODE.optional(), idempotency_key: z.string().max(255).optional() },
       annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: true, openWorldHint: false },
     },
     (a) =>
@@ -201,6 +204,7 @@ export function createKanutusServer(opts: ServerOptions): McpServer {
         duration_min: z.number().int().min(5).max(720).optional(),
         invitees: z.array(z.string().email()).max(50).optional(),
         langs: z.array(LANG).max(12).optional(),
+        bill_mode: BILL_MODE.optional(),
         idempotency_key: z.string().max(255).optional(),
       },
       annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: true, openWorldHint: false },
