@@ -5,7 +5,7 @@
   "license": "MIT",
   "type": "module",
   "homepage": "https://docs.kanutus.com/mcp",
-  "repository": { "type": "git", "url": "https://github.com/kanutus/mcp" },
+  "repository": { "type": "git", "url": "git+https://github.com/kanutus/mcp.git" },
   "keywords": ["mcp", "model-context-protocol", "kanutus", "translation", "meetings"],
   "bin": { "kanutus-mcp": "dist/stdio.js" },
   "main": "dist/index.js",
