@@ -96,6 +96,9 @@ const ROOM_ID = z.string().regex(/^[a-z]{3}-[a-z]{4}-[a-z]{3}$/).describe("Room 
 const BILL_MODE = z
   .enum(["host", "each"])
   .describe("Who pays: \"host\" (default) = the owner's minutes cover everyone; \"each\" = every Kanutus account pays its own part. Guests without an account are always covered by the owner.");
+const GUEST_VOICE_CLONE = z
+  .boolean()
+  .describe("Whether guests without an account may allow their voice to be cloned for this meeting (opt-in checkbox; the copy is deleted 3 days after last use). Default true; only effective when the account's guest-voice feature is on.");
 
 export function createKanutusServer(opts: ServerOptions): McpServer {
   const { client } = opts;
@@ -158,7 +161,7 @@ export function createKanutusServer(opts: ServerOptions): McpServer {
     {
       title: "Create room",
       description: "Create an instant room with live translation and get its link. Free: translation is charged while people speak.",
-      inputSchema: { title: z.string().max(120).optional(), visibility: z.enum(["private", "public"]).optional(), langs: z.array(LANG).max(12).optional(), bill_mode: BILL_MODE.optional(), idempotency_key: z.string().max(255).optional() },
+      inputSchema: { title: z.string().max(120).optional(), visibility: z.enum(["private", "public"]).optional(), langs: z.array(LANG).max(12).optional(), bill_mode: BILL_MODE.optional(), guest_voice_clone: GUEST_VOICE_CLONE.optional(), idempotency_key: z.string().max(255).optional() },
       annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: true, openWorldHint: false },
     },
     (a) =>
@@ -205,6 +208,7 @@ export function createKanutusServer(opts: ServerOptions): McpServer {
         invitees: z.array(z.string().email()).max(50).optional(),
         langs: z.array(LANG).max(12).optional(),
         bill_mode: BILL_MODE.optional(),
+        guest_voice_clone: GUEST_VOICE_CLONE.optional(),
         idempotency_key: z.string().max(255).optional(),
       },
       annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: true, openWorldHint: false },
