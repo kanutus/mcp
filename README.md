@@ -78,6 +78,10 @@ Safety:
 
 ## Changelog
 
+- **0.3.7** (2026-10-28): `create_room` and `schedule_meeting` accept `bill_mode` (`host`: the host pays for every
+  participant, default; `each`: every Kanutus account pays its own share) and `guest_voice_clone` (default `true`; `false` hides
+  the opt-in that lets a guest without an account have their voice cloned for the meeting; the copy is deleted 3 days after
+  last use). Nothing else changes.
 - **0.3.6** (2026-10-26): AI avatars are coming soon. `list_avatars` returns an empty list with `status: "coming_soon"`
   and `join_room` accepts `avatar_id` but the agent joins voice only (the answer says so). Nothing else changes.
 - **0.3.5** (2026-10-23): turn taking. `listen` and `say` return `speaking` (who is talking right now) and `listen`
